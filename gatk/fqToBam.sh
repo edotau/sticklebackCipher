@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/sh -e
 
+
+#Set reference:
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 module load bwa samtools/1.9-gcb01 GATK/4.1.3.0-gcb01
 #used by trim_galore
