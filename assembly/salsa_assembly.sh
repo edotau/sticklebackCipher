@@ -1,26 +1,23 @@
 #!/bin/sh
-module add python/2.7.11-fasrc01 
-module add boost/1.59.0-gcb01
-module add gcc/6.2.0-fasrc01
-module add java
-salsa=/data/lowelab/edotau/software/SALSA/run_pipeline.py
+#SBATCH --mem=64G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=12
+#SBATCH --nodes=1
+#SBATCH --parsable
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=eric.au@duke.edu
+#SBATCH --job-name=HicAssembly
+module load python/2.7.11-fasrc01 boost/1.59.0-gcb01 gcc/6.2.0-fasrc01 java samtools
+salsa=/data/lowelab/edotau/sticklebackCipher/assembly/SALSA/run_pipeline.py
 
 bedfile=$1
 REF=$2
 FAIDX=$REF.fai
-#REF=/data/lowelab/RefGenomes/rabs/5.2/rabsDraft5.2.fasta
-#FAIDX=/data/lowelab/RefGenomes/rabs/5.2/rabsDraft5.2.fasta.fai
-python $salsa \
-	-a $REF \
-	-l $FAIDX \
-	-b $bedfile \
-	-e GATC,GANTC \
-	-m yes \
-	-p yes \
-	-c 10000 \
-	-o $3
+samtools faidx $REF
+python $salsa -a $REF -l $FAIDX -b $bedfile -e GATC,GANTC -m yes -p yes -c 10000 -o $3
+
 echo "Finished scaffolding, now generating hi-c contact maps, could take several days...."
-/data/lowelab/edotau/software/SALSA/convert.sh $3
+/data/lowelab/edotau/software/SALSA/convert.sh $3/
 
 #stitch=/data/lowelab/edotau/software/SALSA/stitch.py
 #unitig_bed=/data/lowelab/edotau/scratch/arimaHiC/unitigs_canu/rabs.4.1.canu.unitigs.bed
