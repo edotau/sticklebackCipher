@@ -1,7 +1,7 @@
 #!/bin/sh -e
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=12
 #SBATCH --nodes=1
 #SBATCH --job-name=toGenotypeVcf
 
@@ -20,7 +20,7 @@ markedDups=$DIR/${PREFIX}.markedDups.bam
 output=$DIR/${PREFIX}.gatk.valid.bam
 gVcf=$DIR/${PREFIX}.wgs.g.vcf.gz
 
-gatk --java-options "-Xmx4G" MarkDuplicates -I $BAM -O $markedDups -M $DIR/${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
+gatk --java-options "-Xmx16G" MarkDuplicates -I $BAM -O $markedDups -M $DIR/${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
 #adds Read group information to bam alignments
 #this is how GATK differentiates between your cohort of samples
 
@@ -30,11 +30,11 @@ platform="Illumina"
 unit="HiSeqX"
 sampleID=$PREFIX
 
-gatk --java-options "-Xmx8G" AddOrReplaceReadGroups -I $markedDups -O /dev/stdout -LB $library -PL $platform -PU $unit -SM $PREFIX | gatk --java-options "-Xmx4G" FixMateInformation -I /dev/stdin -O $output -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true
+gatk --java-options "-Xmx16G" AddOrReplaceReadGroups -I $markedDups -O /dev/stdout -LB $library -PL $platform -PU $unit -SM $PREFIX | gatk --java-options "-Xmx16G" FixMateInformation -I /dev/stdin -O $output -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true
 samtools index $output
 
 #Now run GATK on processed BAM
-gatk HaplotypeCaller --java-options "-Xmx12G" \
+gatk HaplotypeCaller --java-options "-Xmx32G" \
 	-I $output -O $gVcf -R $REF \
-	-ERC GVCF --native-pair-hmm-threads 8 \
+	-ERC GVCF --native-pair-hmm-threads 12 \
 rm $markedDups ${markedDups}.bai

@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --nodes=1
@@ -16,11 +16,11 @@ do
 	echo $i >> $samples
 done
 mergedVcf=${PREFIX}.merged.g.vcf.gz
-gatk CombineGVCFs --java-options "-Xmx8g" \
+gatk CombineGVCFs --java-options "-Xmx32g" \
 	-R /data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta \
 	-V $samples \
 	-O $mergedVcf \
 	-G StandardAnnotation -G AS_StandardAnnotation
 rm $samples
-#sbatch /data/lowelab/edotau/sticklebackCipher/gatk/getSNPS.sh $mergedVcf
-#sbatch /data/lowelab/edotau/sticklebackCipher/gatk/getIndels.sh $mergedVcf
+sbatch /data/lowelab/edotau/sticklebackCipher/gatk/getSNPS.sh $mergedVcf
+sbatch /data/lowelab/edotau/sticklebackCipher/gatk/getIndels.sh $mergedVcf
