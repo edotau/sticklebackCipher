@@ -10,6 +10,8 @@ module load bedtools2/2.25.0-fasrc01
 module load kentUtils/v302-gcb01
 BAM=$1
 REF=$2
+mkdir -p $DIR
+DIR=${PREFIX}toPeakCalls
 PREFIX=$(echo $BAM | sed 's/.bam//')
 bed=${PREFIX}.bed
 bamToBed -i $BAM > $bed

@@ -7,6 +7,7 @@
 #SBATCH --time=1-00:00:00
 BAM=$1
 PREFIX=$(basename $BAM .bam)
+DIR=${PREFIX}toPeakCalls
 markedDups=${PREFIX}.markedDups.bam
 module load GATK/4.1.3.0-gcb01
 module load samtools java/1.8.0_45-fasrc01
@@ -21,3 +22,4 @@ rm $markedDups ${markedDups}.bai
 peakCaller=/data/lowelab/edotau/sticklebackCipher/bin/Genrich/Genrich
 $peakCaller -t $qNameSort -o ${PREFIX}.tmp -j -y -v -D
 sort -k1,1 -k2,2n ${PREFIX}.tmp > ${PREFIX}pValue.bed
+#https://github.com/jsh58/Genrich
