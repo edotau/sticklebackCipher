@@ -10,7 +10,7 @@ module load cutadapt/2.3-gcb01 python/3.7.4-gcb01 pigz/2.3.4-gcb01
 READ1=$1
 READ2=$2
 
-PREFIX=$(basename $READ1 _1.fq.gz | cut -d '_' -f 1)
+PREFIX=$(basename $READ1 _1.fq.gz )
 DIR=${PREFIX}"to"$(basename $REF | cut -d '.' -f 1)
 mkdir -p $DIR
 

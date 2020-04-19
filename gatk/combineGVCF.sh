@@ -15,8 +15,12 @@ for i in *.g.vcf.gz
 do
 	echo $i >> $samples
 done
+mergedVcf=${PREFIX}.merged.g.vcf.gz
 gatk CombineGVCFs --java-options "-Xmx8g" \
 	-R /data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta \
 	-V $samples \
-	-O ${PREFIX}.merged.vcf.gz
+	-O $mergedVcf \
+	-G StandardAnnotation -G AS_StandardAnnotation
 rm $samples
+#sbatch /data/lowelab/edotau/sticklebackCipher/gatk/getSNPS.sh $mergedVcf
+#sbatch /data/lowelab/edotau/sticklebackCipher/gatk/getIndels.sh $mergedVcf

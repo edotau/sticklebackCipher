@@ -1,4 +1,11 @@
 #!/bin/sh
+BAM=$1
+PREFIX=$(basename $BAM .bam)
+#SBATCH --mem=16G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --nodes=1
+#SBATCH --job-name=${PREFIX}
 module load GATK/4.1.3.0-gcb01
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 snpDb=/data/lowelab/edotau/toGasAcu2RABS/gVcf_LITXxMATA/filterDbLITCxMATAGenotypeGVCFs.Filtered.SNP.vcf.gz
