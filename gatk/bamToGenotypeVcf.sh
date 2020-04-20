@@ -14,11 +14,12 @@ module load GATK/4.1.3.0-gcb01
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 #if you want to name your files anything else set these variables
 
-DIR=${PREFIX}"_genotypeVcfs"
+DIR=${PREFIX}"_workToGatk"
 mkdir -p $DIR
 markedDups=$DIR/${PREFIX}.markedDups.bam
 output=$DIR/${PREFIX}.gatk.valid.bam
-gVcf=$DIR/${PREFIX}.wgs.g.vcf.gz
+#final output
+gVcf=${PREFIX}.g.vcf.gz
 
 gatk --java-options "-Xmx16G" MarkDuplicates -I $BAM -O $markedDups -M $DIR/${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
 #adds Read group information to bam alignments
@@ -30,7 +31,7 @@ platform="Illumina"
 unit="HiSeqX"
 sampleID=$PREFIX
 
-gatk --java-options "-Xmx16G" AddOrReplaceReadGroups -I $markedDups -O /dev/stdout -LB $library -PL $platform -PU $unit -SM $PREFIX | gatk --java-options "-Xmx16G" FixMateInformation -I /dev/stdin -O $output -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true
+gatk --java-options "-Xmx16G" AddOrReplaceReadGroups -I $markedDups -O /dev/stdout -LB $library -PL $platform -PU $unit -SM $PREFIX | gatk --java-options "-Xmx16G" FixMateInformation -I /dev/stdin -O $output -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true -TMP_DIR $DIR/"fixmate.tmp"
 samtools index $output
 
 #Now run GATK on processed BAM

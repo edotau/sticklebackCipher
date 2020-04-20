@@ -9,6 +9,8 @@ module load cutadapt/2.3-gcb01 python/3.7.4-gcb01 pigz/2.3.4-gcb01
 
 READ1=$1
 READ2=$2
+#Final output:
+BAM=${PREFIX}.bam
 
 PREFIX=$(basename $READ1 _1.fq.gz )
 DIR=${PREFIX}"to"$(basename $REF | cut -d '.' -f 1)
@@ -33,6 +35,5 @@ input2=$DIR/${PREFIX}_R2.fastq.gz
 #MAPPING
 
 echo -e "["$(date)"]\tAligning and sorting..."
-BAM=$DIR/${PREFIX}.bam
 bwa mem -t 8 $REF $1 $2 | samtools view -hb /dev/stdin | samtools sort -@ 4 -T $DIR/${PREFIX}.tmp -o $BAM
 samtools index $BAM

@@ -17,7 +17,7 @@ module load cutadapt/2.3-gcb01 python/3.7.4-gcb01 pigz/2.3.4-gcb01
 READ1=$1
 READ2=$2
 
-PREFIX=$(basename $READ1 _1.fq.gz )
+PREFIX=$(basename $READ1 _R1.fastq.gz)
 DIR=${PREFIX}"_genotypeVcfs"
 mkdir -p $DIR
 
@@ -49,7 +49,7 @@ markedDups=$DIR/${PREFIX}.markedDups.bam
 fixedBAM=$DIR/${PREFIX}.gatk.valid.bam
 gVcf=$DIR/${PREFIX}.wgs.g.vcf.gz
 
-gatk --java-options "-Xmx16G" MarkDuplicates -I $BAM -O $markedDups -M $DIR/${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
+gatk --java-options "-Xmx16G" MarkDuplicates -I $BAM -O $markedDups -M $DIR/${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true -TMP_DIR $DIR/"fixmate.tmp"
 #adds Read group information to bam alignments
 #this is how GATK differentiates between your cohort of samples
 #required aruguments:
