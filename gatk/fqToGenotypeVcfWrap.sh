@@ -1,9 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
 #SBATCH --mem=32G
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=12
 #SBATCH --nodes=1
 #SBATCH --job-name=toGenotypeVcf
+set -e
 #Set reference:
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 

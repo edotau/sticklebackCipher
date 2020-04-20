@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=12
 #SBATCH --nodes=1
 #SBATCH --job-name=toGenotypeVcf
-
+#SBATCH --parsable
 BAM=$1
 PREFIX=$(basename $BAM .bam)
 

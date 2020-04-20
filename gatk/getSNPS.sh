@@ -1,9 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
 #SBATCH --mem=16G
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --nodes=1
 #SBATCH --job-name=SNPs
+set -e
 module add GATK/4.1.0.0-gcb01
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 VCF=$1

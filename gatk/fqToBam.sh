@@ -1,6 +1,11 @@
-#!/bin/sh -e
-
-
+#!/bin/sh
+#SBATCH --mem=16G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --nodes=1
+#SBATCH --parsable
+#SBATCH --time=1-00:00:00
+set -e
 #Set reference:
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 module load bwa samtools/1.9-gcb01 GATK/4.1.3.0-gcb01
@@ -12,8 +17,10 @@ READ2=$2
 #Final output:
 BAM=${PREFIX}.bam
 
+
 PREFIX=$(basename $READ1 _1.fq.gz )
 DIR=${PREFIX}"to"$(basename $REF | cut -d '.' -f 1)
+
 mkdir -p $DIR
 
 trim_galore=/data/lowelab/edotau/software/TrimGalore-0.6.5/trim_galore
