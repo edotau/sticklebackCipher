@@ -27,5 +27,8 @@ mergeGvcf=$(sbatch --dependency=singleton  --job-name=$bamToQC ./combineGVCF.sh 
 genotypeVcf=$(sbatch --dependency=$mergeGvcf ./toGenotypeVcf ${gVcfMerged}.g.vcf.gz)
 sbatch ./getSNPs ${gVcfMerged}.vcf
 sbatch ./getIndels ${gVcfMerged}.vcf
-	
+
+#Slurm dependency guide I followed:
+#https://hpc.nih.gov/docs/job_dependencies.html
+
 exit 0
