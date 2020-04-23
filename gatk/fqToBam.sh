@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --nodes=1
 #SBATCH --parsable
-#SBATCH --time=1-00:00:00
+#SBATCH --time=0-11:00:00
 set -e
 #Set reference:
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
