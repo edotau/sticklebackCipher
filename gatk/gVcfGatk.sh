@@ -15,7 +15,6 @@ REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 #if you want to name your files anything else set these variables
 
 DIR=$2
-mkdir -p $DIR
 markedDups=$DIR/${PREFIX}.markedDups.bam
 output=$DIR/${PREFIX}.gatk.valid.bam
 #final output
