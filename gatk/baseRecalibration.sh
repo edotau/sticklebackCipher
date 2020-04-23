@@ -1,9 +1,9 @@
 #!/bin/sh
 BAM=$1
 PREFIX=$(basename $BAM .bam)
-#SBATCH --mem=32G
+#SBATCH --mem32G
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=8
 #SBATCH --nodes=1
 #SBATCH --job-name=SNPsToGenotypeVcf
 #SBATCH --mail-type=END,FAIL
@@ -16,24 +16,16 @@ BAM=$1
 PREFIX=$(basename $BAM .bam)
 
 #Set output variables:
-DIR=${PREFIX}_recalGenotypeVcfs
+DIR=$2
 mkdir -p $DIR
 recalBam=$DIR/${PREFIX}.recal.bam
 recalTable=$DIR/${PREFIX}.recal_data.table
-genotypeVcf=$DIR/${PREFIX}.g.vcf.gz
-
 #NOTE: second known site argument is to mask certain varience
-gatk --java-options "-Xmx32g" BaseRecalibrator -R $REF \
+gatk --java-options "-Xmx30g" BaseRecalibrator -R $REF \
 	--known-sites $snpDb \
        	--known-sites  $indelDb \
 	-I $BAM -O $recalTable
 
-gatk --java-options "-Xmx32g" ApplyBQSR -R $REF \
+gatk --java-options "-Xmx30g" ApplyBQSR -R $REF \
 	-I $BAM --bqsr-recal-file $recalTable \
 	-O $recalBam
-
-samtools index $recalBam
-gatk HaplotypeCaller --java-options "-Xmx32G" \
-	--input $recalBam --output $genotypeVcf \
-	--reference $REF \
-	-ERC GVCF --native-pair-hmm-threads 12
