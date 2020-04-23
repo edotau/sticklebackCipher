@@ -19,7 +19,7 @@ READ2=$2
 PREFIX=$(echo $READ1 | rev | cut -d '_' -f 2- | rev)
 ####Final output####
 BAM=${PREFIX}.bam
-DIR="basic_alignment"
+DIR=$3
 mkdir -p $DIR
 
 trim_galore=/data/lowelab/edotau/software/TrimGalore-0.6.5/trim_galore
