@@ -15,6 +15,7 @@ module load cutadapt/2.3-gcb01 python/3.7.4-gcb01 pigz/2.3.4-gcb01
 READ1=$1
 READ2=$2
 #Final output:
+PREFIX=$(echo $READ1 | rev | cut -d '.' -f 3- | rev)
 BAM=${PREFIX}.bam
 
 
