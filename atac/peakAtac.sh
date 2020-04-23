@@ -7,7 +7,7 @@
 #SBATCH --time=1-00:00:00
 BAM=$1
 PREFIX=$(basename $BAM .bam)
-DIR=${PREFIX}toPeakCalls
+DIR=$2
 markedDups=${PREFIX}.markedDups.bam
 module load GATK/4.1.3.0-gcb01
 module load samtools java/1.8.0_45-fasrc01
