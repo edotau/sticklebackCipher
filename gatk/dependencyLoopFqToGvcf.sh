@@ -3,9 +3,9 @@ set -e
 gVcfMerged=stickleback.cohort
 
 for i in *R1*.{fastq,fq}*.gz
-do
-	SUFFIX=$(echo $READ1 | rev | cut -d '_' -f 1,2 | rev)
+do	
 	READ1=$i
+	SUFFIX=$(echo $READ1 | rev | cut -d '_' -f 1,2 | rev)
 	READ2=$(echo $READ1 | rev | cut -d '_' -f 2- | rev).$SUFFIX
 	
 	fqToBam=$(sbatch ./fqToBam.sh $READ1 $READ2)
