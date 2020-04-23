@@ -3,8 +3,6 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --nodes=1
-#SBATCH --job-name=toGenotypeVcf
-
 #Either load modules or assign paths to GATK, samtools, and picard tools
 module load GATK/4.1.3.0-gcb01
 #Set your reference:
