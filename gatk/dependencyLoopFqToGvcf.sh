@@ -23,7 +23,7 @@ do
 	genotypeBAMs=$(sbatch --dependency=afterok:$dupsMates --job-name=$bamToQC gVcfGatk.sh $QCedBAMS/${PREFIX}.bam $toGenotypeVcf)
 done
 
-mergeGvcf=$(sbatch --dependency=singleton  --job-name=$bamToQC ./combineGVCF.sh $gVcfMerged $toGenotypeVcf)
+mergeGvcf=$(sbatch --dependency=singleton --job-name=$bamToQC ./combineGVCF.sh $gVcfMerged $toGenotypeVcf)
 genotypeVcf=$(sbatch --dependency=$mergeGvcf ./toGenotypeVcf ${gVcfMerged}.g.vcf.gz)
 sbatch ./getSNPs ${gVcfMerged}.vcf
 sbatch ./getIndels ${gVcfMerged}.vcf
