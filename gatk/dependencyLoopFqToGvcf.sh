@@ -10,9 +10,11 @@ do
 	
 	fqToBam=$(sbatch ./fqToBam.sh $READ1 $READ2)
 	dupsMates=$(sbatch --dependency=afterok:$fqToBam ./bamToGenotypeVcf.sh ${PREFIX}.bam)
-	mergeGvcf=$(sbatch --dependency=singleton --job-name=toGenotypeVcf ./combineGVCF.sh $gVcfMerged)
-	genotypeVcf=$(sbatch --dependency=$mergeGvcf ./toGenotypeVcf ${gVcfMerged}.g.vcf.gz)
-	sbatch ./getSNPs ${gVcfMerged}.vcf
-	sbatch ./getIndels ${gVcfMerged}.vcf
 done
+
+mergeGvcf=$(sbatch --dependency=singleton --job-name=toGenotypeVcf ./combineGVCF.sh $gVcfMerged)
+genotypeVcf=$(sbatch --dependency=$mergeGvcf ./toGenotypeVcf ${gVcfMerged}.g.vcf.gz)
+sbatch ./getSNPs ${gVcfMerged}.vcf
+sbatch ./getIndels ${gVcfMerged}.vcf
+	
 exit 0
