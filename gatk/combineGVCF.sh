@@ -7,11 +7,12 @@
 
 module load GATK/4.1.3.0-gcb01
 PREFIX=$1
+DIR=${2%/}
 #Write to file, then remove it to make sure it did not contain samples from a different run.
 samples=${PREFIX}.list
 echo $PREFIX >> $samples
 rm $samples
-for i in *.g.vcf.gz
+for i in $DIR/*.g.vcf.gz
 do
 	echo $i >> $samples
 done
