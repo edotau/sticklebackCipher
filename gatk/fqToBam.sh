@@ -9,19 +9,16 @@ set -e
 #Set reference:
 REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 module load bwa samtools/1.9-gcb01
-
 #used by trim_galore
 module load cutadapt/2.3-gcb01 python/3.7.4-gcb01 pigz/2.3.4-gcb01
 
 READ1=$1
 READ2=$2
-
 #depending on which sequencing facility you use, fastq files might come in different naming conventions: ie read.fastq.gz or read.
 #ex. echo CL12w16-3_atac_R1.fastq.gz | rev | cut -d '_' -f 2- | rev > CL12w16-3_atac
 PREFIX=$(echo $READ1 | rev | cut -d '_' -f 2- | rev)
 ####Final output####
 BAM=${PREFIX}.bam
-
 DIR="basic_alignment"
 mkdir -p $DIR
 
