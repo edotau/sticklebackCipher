@@ -21,14 +21,14 @@ PREFIX=$(echo $READ1 | rev | cut -d '_' -f 2- | rev)
 BAM=${PREFIX}.bam
 DIR=$3
 mkdir -p $DIR
-
+fastqDIR="QCedFastqs"
 trim_galore=/data/lowelab/edotau/software/TrimGalore-0.6.5/trim_galore
-$trim_galore -o $DIR --basename $PREFIX --trim-n --max_n 0 --cores 4 --paired $READ1 $READ2
-trim1=$DIR/${PREFIX}_val_1.fq.gz
-trim2=$DIR/${PREFIX}_val_2.fq.gz
+$trim_galore -o $fastqDIR --basename $PREFIX --trim-n --max_n 0 --cores 4 --paired $READ1 $READ2
+trim1=$fastqDIR/${PREFIX}_val_1.fq.gz
+trim2=$fastqDIR/${PREFIX}_val_2.fq.gz
 
-input1=$DIR/${PREFIX}_R1.fastq.gz
-input2=$DIR/${PREFIX}_R2.fastq.gz
+input1=$fastqDIR/${PREFIX}_R1.fastq.gz
+input2=$fastqDIR/${PREFIX}_R2.fastq.gz
 
 #Second Trimming of adaptors:
 /data/lowelab/software/bbmap/bbduk.sh \
