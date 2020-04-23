@@ -15,7 +15,6 @@ REF=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta
 #if you want to name your files anything else set these variables
 
 DIR=$2
-"toGenotypeVcfs"
 mkdir -p $DIR
 markedDups=$DIR/${PREFIX}.markedDups.bam
 output=$DIR/${PREFIX}.gatk.valid.bam
@@ -24,6 +23,5 @@ gVcf=${PREFIX}.g.vcf.gz
 
 #Now run GATK on processed BAM
 gatk HaplotypeCaller --java-options "-Xmx32G" \
-	-I $output -O $gVcf -R $REF \
+	-I $BAM -O $gVcf -R $REF \
 	-ERC GVCF --native-pair-hmm-threads 12 \
-rm $markedDups ${markedDups}.bai
