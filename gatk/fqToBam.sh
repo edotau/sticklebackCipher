@@ -16,13 +16,10 @@ module load cutadapt/2.3-gcb01 python/3.7.4-gcb01 pigz/2.3.4-gcb01
 READ1=$1
 READ2=$2
 
-#depending on which sequencing facility you use, fastq files might
-#come in different naming conventions: ie read.fastq.gz or read.
-
-#ex. echo CL12w16-3_atac_R1.fastq.gz | rev | cut -d '_' -f 2- | rev
-#CL12w16-3_atac
+#depending on which sequencing facility you use, fastq files might come in different naming conventions: ie read.fastq.gz or read.
+#ex. echo CL12w16-3_atac_R1.fastq.gz | rev | cut -d '_' -f 2- | rev > CL12w16-3_atac
 PREFIX=$(echo $READ1 | rev | cut -d '_' -f 2- | rev)
-#Final output:
+####Final output####
 BAM=${PREFIX}.bam
 
 DIR="basic_alignment"
