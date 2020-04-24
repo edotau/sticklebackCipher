@@ -18,9 +18,8 @@ READ2=$2
 #ex. echo CL12w16-3_atac_R1.fastq.gz | rev | cut -d '_' -f 2- | rev > CL12w16-3_atac
 PREFIX=$(echo $READ1 | rev | cut -d '_' -f 2- | rev)
 ####Final output####
-BAM=${PREFIX}.bam
-DIR=$3
-mkdir -p $DIR
+DIR=${3%/}
+BAM=$DIR/${PREFIX}.bam
 fastqDIR="QCedFastqs"
 trim_galore=/data/lowelab/edotau/software/TrimGalore-0.6.5/trim_galore
 $trim_galore -o $fastqDIR --basename $PREFIX --trim-n --max_n 0 --cores 4 --paired $READ1 $READ2
