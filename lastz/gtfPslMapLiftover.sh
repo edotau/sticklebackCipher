@@ -12,7 +12,7 @@ genePredToPsl=/data/lowelab/cl454/bin/x86_64/genePredToPsl
 psl=${PREFIX}.psl
 $genePredToPsl $chromSizes $gp $psl
 mappedPsl=${output}.psl
-map=/data/lowelab/cl454/bin/x86_64/pslMap -chainMapFile -swapMap $psl $chain $mappedPsl
+/data/lowelab/cl454/bin/x86_64/pslMap -chainMapFile -swapMap $psl $chain $mappedPsl
 /data/lowelab/cl454/bin/x86_64/pslToBed $mappedPsl ${output}.bed
 rm $gp $psl
 bedToGenePred ${output}.bed ${output}.gp
