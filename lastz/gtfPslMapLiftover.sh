@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh set -e
 module add gcc kentUtils
 GTF=$1
 chain=$2
