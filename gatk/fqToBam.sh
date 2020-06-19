@@ -39,5 +39,5 @@ input2=$fastqDIR/${PREFIX}_R2.fastq.gz
 #clean directory: rm $trim1 $ trim2
 #MAPPING
 echo -e "["$(date)"]\tAligning and sorting..."
-bwa mem -t 8 $REF $1 $2| samtools sort -@ 8 -T $DIR/${PREFIX}.tmp /dev/stdin > $BAM
+bwa mem -t 8 $REF $input1 $input2| samtools sort -@ 8 -T $DIR/${PREFIX}.tmp /dev/stdin > $BAM
 samtools index $BAM

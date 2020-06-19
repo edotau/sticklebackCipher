@@ -18,15 +18,16 @@ output=$DIR/${PREFIX}.gatk.valid.bam
 #final output
 gVcf=${PREFIX}.g.vcf.gz
 
-gatk --java-options "-Xmx16G" MarkDuplicates -I $BAM -O $markedDups -M $DIR/${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
+gatk --java-options "-Xmx16G" MarkDuplicates -I $BAM -O $markedDups -M /dev/null -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
 #adds Read group information to bam alignments
 #this is how GATK differentiates between your cohort of samples
 #required aruguments:
 library="WGS"
-platform="Illumina"
+platform=$(samtools view $BAM | head -n 1 | cut -f 1 | | cut -d ':' -f 3,4 | tr ':' '.'))
 unit="HiSeqX"
 sampleID=$PREFIX
 
 samtools view -b -@ 8 -f 1 $markedDups | gatk --java-options "-Xmx16G" AddOrReplaceReadGroups -I /dev/stdin -O /dev/stdout -LB $library -PL $platform -PU $unit -SM $PREFIX | gatk --java-options "-Xmx16G" FixMateInformation -I /dev/stdin -O $output -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true -TMP_DIR $DIR/"fixmate.tmp"
 samtools index $output
+
 echo "Ready to run GATK on processed $PREIX BAM"
