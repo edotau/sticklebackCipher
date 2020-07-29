@@ -12,7 +12,7 @@ PREFIX=$(basename $VCF .vcf.gz)
 
 rawINDEL=${PREFIX}.raw.INDEL.vcf.gz
 defaultINDEL=${PREFIX}.basic.Mark.vcf.gz
-filterINDEL=${PREFIX}.Filtered.INDEL.vcf.gz
+filterINDEL=${PREFIX}.HardFiltered.INDEL.vcf.gz
 gatk --java-options "-Xmx16g" SelectVariants -R $REF -V $VCF -select-type INDEL -O $rawINDEL
 gatk --java-options "-Xmx16g" VariantFiltration -R $REF -V $rawINDEL --filter-expression "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0" --filter-name "default_indel_filter" -O $defaultINDEL
 

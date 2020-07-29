@@ -1,11 +1,14 @@
 #!/bin/sh
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=6
+#SBATCH --cpus-per-task=12
 #SBATCH --nodes=1
 #SBATCH --parsable
-#SBATCH --job-name=getGenotypes
+#SBATCH --job-name=SNPs
 module load GATK/4.1.3.0-gcb01
 BAM=$1
-PREFIX=$(basename $BAM .bam)
-gatk HaplotypeCaller --java-options "-Xmx32G" --input $BAM --output ${PREFIX}.g.vcf --reference /data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta -ERC GVCF
+PREFIX=$(basename $BAM .gatk.valid.recal.bam)
+DIR=GVCFs
+mkdir -p $DIR
+GVCF=$DIR/${PREFIX}.g.vcf.gz
+gatk HaplotypeCaller --java-options "-Xmx50G" --input $BAM --output $GVCF --reference /data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.fasta -ERC GVCF -G StandardAnnotation -G AS_StandardAnnotation -G StandardHCAnnotation --native-pair-hmm-threads 12
