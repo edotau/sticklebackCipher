@@ -3,7 +3,6 @@
 #SBATCH --ntasks=2
 #SBATCH --cpus-per-task=8
 #SBATCH --mail-type=END,FAIL --mail-user=eric.au@duke.edu
-#SBATCH --job-name=RNASEQ.sh
 set -e
 module add samtools
 OUT=$1
@@ -17,11 +16,8 @@ echo "
 samtools index $OUT"
 samtools index $OUT
 
-echo "
-$PWD/stringtie_exe.sh $OUT"
 
 module add StringTie/2.1.1-gcb01
-#GTF=/data/lowelab/edotau/rabsTHREEspine/index/bepa_v1_ensembl_pslMappedRabs.gtf
-#BAM=$1
-#PREFIX=$(basename $BAM .bam)
-#stringtie $BAM -p $SLURM_CPUS_ON_NODE -o ${PREFIX}.gtf -l RNASEQ
+GTF=/data/lowelab/edotau/rabsTHREEspine/index/bepa_v1_ensembl_pslMappedRabs.gtf
+
+stringtie $OUT -p $SLURM_CPUS_ON_NODE -o $OUT.gtf -l RNASEQ
