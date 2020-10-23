@@ -19,4 +19,9 @@ samtools index $OUT
 
 echo "
 $PWD/stringtie_exe.sh $OUT"
-$PWD/stringtie_exe.sh $OUT
+
+module add StringTie/2.1.1-gcb01
+#GTF=/data/lowelab/edotau/rabsTHREEspine/index/bepa_v1_ensembl_pslMappedRabs.gtf
+#BAM=$1
+#PREFIX=$(basename $BAM .bam)
+#stringtie $BAM -p $SLURM_CPUS_ON_NODE -o ${PREFIX}.gtf -l RNASEQ
