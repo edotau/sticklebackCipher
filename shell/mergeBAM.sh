@@ -1,9 +1,22 @@
 #!/bin/sh
-
+#SBATCH --mem=32G
+#SBATCH --ntasks=2
+#SBATCH --cpus-per-task=8
+#SBATCH --mail-type=END,FAIL --mail-user=eric.au@duke.edu
+#SBATCH --job-name=RNASEQ.sh
 set -e
 module add samtools
 OUT=$1
-samtools merge -@ $SLURM_CPUS_ON_NODE - *.pbalign_DRAFT.bam | samtools sort -@ $SLURM_CPUS_ON_NODE > $OUT
-pbindex $OUT & samtools index -@ $SLURM_CPUS_ON_NODE $OUT
-REF=/data/lowelab/edotau/2.5_RABS.draft/hic/hic2.0_Scaffolds_THREE_Spine/RABS_DRAFT_2.46.fa
-quiver -j $SLURM_CPUS_ON_NODE --noEvidenceConsensusCall=nocall --algorithm=arrow $OUT -r $REF -o RABS_draft2.4_10xScafHiCanu.fasta -o RABS_draft2.4_10xScafHiCanu.fastq -o variants.gff
+SORT_THREADS=$(($SLURM_CPUS_ON_NODE / 4))
+THREADS=$(($SLURM_CPUS_ON_NODE - $SORT_THREADS))
+echo "
+samtools merge -@ $THREADS - *.bam | samtools sort -@ $SORT_THREADS -m 2G > $OUT"
+samtools merge -@ $THREADS - *.bam | samtools sort -@ $SORT_THREADS -m 2G > $OUT
+
+echo "
+samtools index $OUT"
+samtools index $OUT
+
+echo "
+$PWD/stringtie_exe.sh $OUT"
+$PWD/stringtie_exe.sh $OUT
