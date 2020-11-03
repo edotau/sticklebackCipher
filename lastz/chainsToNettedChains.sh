@@ -1,6 +1,6 @@
 #!/bin/sh
 #SBATCH --mem=16G
-#SBATCH --cpus-per-task=6
+#SBATCH --cpus-per-task=1
 #SBATCH --ntasks=1
 #SBATCH --time=0-06
 #SBATCH --nodes=1
