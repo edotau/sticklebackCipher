@@ -36,9 +36,11 @@ chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSy
 netFilter -minScore=500000 $net > ${PREFIX}Filtered.net
 
 netChainSubset ${PREFIX}Filtered.net ${PREFIX}.all.sorted.chain ${PREFIX}Netted.chain
-axt=${PREFIX}.NettedChain.axt
+axt=${PREFIX}NettedChain.axt
 netToAxt ${PREFIX}Filtered.net ${PREFIX}.all.sorted.chain $bitTarget $bitQuery $axt
+samfile=${PREFIX}.sam
+/data/lowelab/edotau/gonomics/cmd/axtSam/axtSam -chrom $target $axt $samfile
 
-axtToSam=/data/lowelab/edotau/RABS.HiCanuScaff10x/software/gonomics/cmd/axtSam/axtSam
-$axtToSam -chrom $target $axt /dev/stdout | samtools sort -@ $SLURM_CPUS_ON_NODE > ${PREFIX}.NettedChain.bam
-samtools index ${PREFIX}.NettedChain.bam
+module add samtools
+samtools sort -@ $SLURM_CPUS_ON_NODE $samfile > ${PREFIX}.bam
+samtools index ${PREFIX}.bam
