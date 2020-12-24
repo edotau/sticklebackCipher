@@ -16,5 +16,5 @@ $lastz $target $query --format=axt --output=$axt --scores=$humanChimp \
         O=600 E=150 T=2 M=254 K=4500 L=4500 Y=15000 C=0
         
 echo "finished lastz"
-axtChain -linearGap=medium -scoreScheme=$humanChimp $a -faT $target -faQ $query /dev/stdout | chainSort /dev/stdin $chainOut ${PREFIX}.chain
+axtChain -linearGap=medium -scoreScheme=$humanChimp $axt -faT $target -faQ $query /dev/stdout | chainSort /dev/stdin $chainOut ${PREFIX}.chain
 echo "DONE"
