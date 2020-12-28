@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 set -e
 
-###INPUTS:
+###INPUTS####:
 targetContigs=$1
 queryContigs=$2
 DIR=${3%/}
@@ -86,6 +86,14 @@ echo "
 echo "
 samtools index ${PREFIX}.bam"
 samtools index ${PREFIX}.bam
+
+netFileStats="netFileStats"
+mkdir -p $netFileStats
+
+echo "
+netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt -syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $net
+"
+netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt -syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $net
 
 rm ${PREFIX}.sam ${PREFIX}ChainPreNet.chain
 
