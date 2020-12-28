@@ -38,7 +38,6 @@ echo "
 faToTwoBit $targetContigs $bitTarget"
 faToTwoBit $targetContigs $bitTarget
 
-
 echo "
 faToTwoBit $queryContigs $bitQuery"
 faToTwoBit $queryContigs $bitQuery
