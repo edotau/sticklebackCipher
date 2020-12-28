@@ -6,12 +6,13 @@
 #SBATCH --nodes=1
 set -e
 
-export PATH=/data/lowelab/edotau/kentUtils/:/data/lowelab/edotau/bin/envs/htslib/bin/:$PATH
-PREFIX=rabsTHREEbepaSpine
-
+###INPUTS:
 targetContigs=$1
 queryContigs=$2
 DIR=${3%/}
+PREFIX=$4
+
+export PATH=/data/lowelab/edotau/kentUtils/:/data/lowelab/edotau/bin/envs/htslib/bin/:$PATH
 
 targetPREFIX=$(basename $targetContigs .fa)
 queryPREFIX=$(basename $queryContigs .fa)
@@ -22,9 +23,8 @@ query=${queryPREFIX}.sizes
 bitTarget=${targetPREFIX}.2bit
 bitQuery=${queryPREFIX}.2bit
 
-#outputs#
 net=${PREFIX}.net
-axt=${PREFIX}.chain.netted.axt
+axt=${PREFIX}.netted.chains.axt
 
 echo "
 faSize -detailed $targetContigs > $target"
@@ -38,7 +38,9 @@ echo "
 faToTwoBit $targetContigs $bitTarget"
 faToTwoBit $targetContigs $bitTarget
 
-echo "faToTwoBit $queryContigs $bitQuery"
+
+echo "
+faToTwoBit $queryContigs $bitQuery"
 faToTwoBit $queryContigs $bitQuery
 
 echo "
@@ -59,15 +61,18 @@ chainPreNet ${PREFIX}.all.chain $target $query ${PREFIX}ChainPreNet.chain"
 chainPreNet ${PREFIX}.all.chain $target $query ${PREFIX}ChainPreNet.chain
 
 echo "
-chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -minScore=1000000 > $net"
+chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -minScore=1000000 > $net
+"
 chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -minScore=1000000 > $net
 
 echo "
-netChainSubset $net ${PREFIX}ChainPreNet.chain ${PREFIX}.netted.chain"
+netChainSubset $net ${PREFIX}ChainPreNet.chain ${PREFIX}.netted.chain
+"
 netChainSubset $net ${PREFIX}ChainPreNet.chain ${PREFIX}.netted.chain
 
 echo "
-netToAxt $net ${PREFIX}.all.chain $bitTarget $bitQuery $axt"
+netToAxt $net ${PREFIX}.all.chain $bitTarget $bitQuery $axt
+"
 netToAxt $net ${PREFIX}.all.chain $bitTarget $bitQuery $axt
 
 echo "
@@ -75,9 +80,14 @@ axtDropOverlap $axt $target $query ${axt}.tmp; mv ${axt}.tmp $axt"
 axtDropOverlap $axt $target $query ${axt}.tmp; mv ${axt}.tmp $axt
 
 echo "
-/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target $axt /dev/stdout | samtools sort -@ $SLURM_CPUS_ON_NODE /dev/stdin > ${PREFIX}.bam"
-/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target $axt /dev/stdout | samtools sort -@ $SLURM_CPUS_ON_NODE /dev/stdin > ${PREFIX}.bam
+/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target $axt ${PREFIX}.sam; samtools sort -@ $SLURM_CPUS_ON_NODE ${PREFIX}.sam > ${PREFIX}.bam
+"
+/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target $axt ${PREFIX}.sam; samtools sort -@ $SLURM_CPUS_ON_NODE ${PREFIX}.sam > ${PREFIX}.bam
 
 echo "
 samtools index ${PREFIX}.bam"
 samtools index ${PREFIX}.bam
+
+rm ${PREFIX}.sam
+
+echo "FINISHED"
