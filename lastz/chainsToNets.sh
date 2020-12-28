@@ -51,8 +51,8 @@ cat chainMerge/*.chain > ${PREFIX}.all.chain"
 cat chainMerge/*.chain > ${PREFIX}.all.chain
 
 echo "
-chainSort ${PREFIX}.all.chain ${PREFIX}.all.sorted.chain; cat ${PREFIX}.all.sorted.chain | grep -v '#' > ${PREFIX}.all.chain"
-chainSort ${PREFIX}.all.chain ${PREFIX}.all.sorted.chain; cat ${PREFIX}.all.sorted.chain | grep -v '#' > ${PREFIX}.all.chain
+chainSort ${PREFIX}.all.chain ${PREFIX}.all.sorted.chain; cat ${PREFIX}.all.sorted.chain | grep -v '#' > ${PREFIX}.all.chain; rm ${PREFIX}.all.sorted.chain"
+chainSort ${PREFIX}.all.chain ${PREFIX}.all.sorted.chain; cat ${PREFIX}.all.sorted.chain | grep -v '#' > ${PREFIX}.all.chain; rm ${PREFIX}.all.sorted.chain
 rm -r chainMerge
 
 echo "
@@ -60,9 +60,9 @@ chainPreNet ${PREFIX}.all.chain $target $query ${PREFIX}ChainPreNet.chain"
 chainPreNet ${PREFIX}.all.chain $target $query ${PREFIX}ChainPreNet.chain
 
 echo "
-chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -minScore=1000000 > $net
+chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -chimpSyn > $net
 "
-chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -minScore=1000000 > $net
+chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin $net | netFilter /dev/stdout -chimpSyn > $net
 
 echo "
 netChainSubset $net ${PREFIX}ChainPreNet.chain ${PREFIX}.netted.chain
@@ -87,6 +87,6 @@ echo "
 samtools index ${PREFIX}.bam"
 samtools index ${PREFIX}.bam
 
-rm ${PREFIX}.sam
+rm ${PREFIX}.sam ${PREFIX}ChainPreNet.chain
 
 echo "FINISHED"
