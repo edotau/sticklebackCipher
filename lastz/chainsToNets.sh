@@ -7,16 +7,15 @@
 set -e
 
 export PATH=/data/lowelab/edotau/kentUtils/:/data/lowelab/edotau/bin/envs/htslib/bin/:$PATH
-PREFIX=rabsTHREEbepaSpine
 
-targetContigs=/data/lowelab/edotau/rabsTHREEspine/index/rabsTHREEspine.fa
-queryContigs=/data/lowelab/edotau/toGasAcu1.5/idx/stickleback_v5_assembly.fa
-
-DIR=/data/lowelab/edotau/rabsTHREEspine/lastz/axtChains/chains
-###DIR=${3%/}###
+targetContigs=$1
+queryContigs=$2
+DIR=${3%/}
 
 targetPREFIX=$(basename $targetContigs .fa)
 queryPREFIX=$(basename $queryContigs .fa)
+
+PREFIX=${targetPREFIX}_${queryPREFIX}
 
 target=${targetPREFIX}.sizes
 query=${queryPREFIX}.sizes
