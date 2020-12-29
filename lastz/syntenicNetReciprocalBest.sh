@@ -6,8 +6,8 @@
 #SBATCH --nodes=1
 set -e
 
-queryFa=gasAcu1-4.fa
-targetFa=/data/lowelab/edotau/rabsTHREEspine/index/rabsTHREEspine.fa
+queryFa=$1
+targetFa=$2
 CHAINQ=rabs3Bepa4Netted.chain
 
 QNAME=$(basename $queryFa .fa)
