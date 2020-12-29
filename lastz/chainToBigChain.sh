@@ -1,9 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
 module load gcc
 hgLoadChain=/data/lowelab/cl454/bin/x86_64/hgLoadChain
 bedToBigBed=/data/lowelab/cl454/bin/x86_64/bedToBigBed
 chain=$1
-chromSizes=/data/lowelab/edotau/toGasAcu2RABS/gasAcu2RABS/gasAcu2RABS.sizes
+chromSizes=$2
 PREFIX=$(basename $chain .chain)
 
 $hgLoadChain -noBin -test hg38 bigChain $chain
