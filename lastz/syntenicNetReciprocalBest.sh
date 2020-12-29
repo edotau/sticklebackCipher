@@ -21,7 +21,6 @@ BITTARGET=${TNAME}.2bit
 
 export PATH=/data/lowelab/edotau/kentUtils:/data/lowelab/edotau/bin/envs/htslib/bin:$PATH
 
-
 echo "
 chainStitchId $CHAINQ /dev/stdout | chainSwap /dev/stdin /dev/stdout | chainSort /dev/stdin ${QNAME}.${TNAME}.tBest.chain
 "
@@ -36,7 +35,6 @@ echo "
 netChainSubset ${QNAME}.${TNAME}.rBest.net.gz ${QNAME}.${TNAME}.tBest.chain /dev/stdout | chainStitchId /dev/stdin /dev/stdout | gzip -c > ${QNAME}.${TNAME}.rBest.netted.chain.gz
 "
 netChainSubset ${QNAME}.${TNAME}.rBest.net.gz ${QNAME}.${TNAME}.tBest.chain /dev/stdout | chainStitchId /dev/stdin /dev/stdout | gzip -c > ${QNAME}.${TNAME}.rBest.netted.chain.gz
-
 
 echo "
 chainSwap ${QNAME}.${TNAME}.rBest.netted.chain.gz /dev/stdout | chainSort /dev/stdin /dev/stdout | gzip -c > ${TNAME}.${QNAME}.rBest.netted.chain.gz
@@ -65,9 +63,8 @@ netToAxt ${TNAME}.${QNAME}.rbest.net.gz ${TNAME}.${QNAME}.rBest.netted.chain.gz 
 netToAxt ${TNAME}.${QNAME}.rbest.net.gz ${TNAME}.${QNAME}.rBest.netted.chain.gz $BITTARGET $BITQUERY /dev/stdout | axtSort /dev/stdin /dev/stdout | gzip -c > ${TNAME}.${QNAME}.rBest.netted.chain.axt.gz
 
 echo "
-/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target ${TNAME}.${QNAME}.rBest.netted.chain.axt.gz ${TNAME}.${QNAME}.rBest.netted.chain.sam
-"
-/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target ${TNAME}.${QNAME}.rBest.netted.chain.axt.gz ${TNAME}.${QNAME}.rBest.netted.chain.sam
+/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $TCHROM ${TNAME}.${QNAME}.rBest.netted.chain.axt.gz ${TNAME}.${QNAME}.rBest.netted.chain.sam"
+/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $TCHROM ${TNAME}.${QNAME}.rBest.netted.chain.axt.gz ${TNAME}.${QNAME}.rBest.netted.chain.sam
 
 echo "
 samtools sort -@ $SLURM_CPUS_ON_NODE ${TNAME}.${QNAME}.rBest.netted.chain.sam > ${TNAME}.${QNAME}.rBest.netted.chain.bam"
