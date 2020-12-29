@@ -5,12 +5,15 @@
 #SBATCH --time=0-02
 #SBATCH --nodes=1
 set -e
-######INPUTS##########
-targetContigs=$1
-queryContigs=$2
-DIR=${3%/}
-PREFIX=$4
-######INPUTS##########
+
+export PATH=/data/lowelab/edotau/kentUtils/:/data/lowelab/edotau/bin/envs/htslib/bin/:$PATH
+PREFIX=rabsTHREEbepaSpine
+
+targetContigs=/data/lowelab/edotau/rabsTHREEspine/index/rabsTHREEspine.fa
+queryContigs=/data/lowelab/edotau/toGasAcu1.5/idx/stickleback_v5_assembly.fa
+
+DIR=/data/lowelab/edotau/rabsTHREEspine/lastz/axtChains/chains
+###DIR=${3%/}###
 
 targetPREFIX=$(basename $targetContigs .fa)
 queryPREFIX=$(basename $queryContigs .fa)
@@ -21,11 +24,8 @@ query=${queryPREFIX}.sizes
 bitTarget=${targetPREFIX}.2bit
 bitQuery=${queryPREFIX}.2bit
 
-net=${PREFIX}.chain.net
+net=${PREFIX}.chain.net.gz
 axt=${PREFIX}.netted.chain.axt
-
-
-export PATH=/data/lowelab/edotau/kentUtils/:/data/lowelab/edotau/bin/envs/htslib/bin/:$PATH
 
 echo "
 faSize -detailed $targetContigs > $target"
@@ -58,16 +58,11 @@ chainSort ${PREFIX}.all.chain ${PREFIX}.sorted.chain
 rm -r chainMerge
 
 echo "
-chainPreNet ${PREFIX}.sorted.chain $target $query ${PREFIX}ChainPreNet.chain"
-chainPreNet ${PREFIX}.sorted.chain $target $query ${PREFIX}ChainPreNet.chain
+chainPreNet ${PREFIX}.sorted.chain $target $query /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | gzip -c > $net
+"
+chainPreNet ${PREFIX}.sorted.chain $target $query /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | gzip -c > $net
 
 rm ${PREFIX}.all.chain
-
-echo "
-chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | netFilter /dev/stdin -minScore=1000000 > $net
-"
-chainNet ${PREFIX}ChainPreNet.chain $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | netFilter /dev/stdin -minScore=1000000 > $net
-
 echo "
 netChainSubset $net ${PREFIX}.sorted.chain ${PREFIX}.netted.chain
 "
@@ -98,6 +93,6 @@ netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill
 "
 netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt a-syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $net
 
-rm ${PREFIX}.sam ${PREFIX}ChainPreNet.chain
+rm ${PREFIX}.sam
 
 echo "FINISHED"
