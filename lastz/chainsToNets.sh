@@ -8,40 +8,53 @@ set -e
 
 export PATH=/data/lowelab/edotau/kentUtils/:/data/lowelab/edotau/bin/envs/htslib/bin/:$PATH
 
-targetContigs=$1
-queryContigs=$2
+TARGET=$1
+QUERY=$2
 DIR=${3%/}
 
-targetPREFIX=$(basename $targetContigs .fa)
-queryPREFIX=$(basename $queryContigs .fa)
+TNAME=$(basename $TARGET .fa)
+QNAME=$(basename $QUERY .fa)
 
-PREFIX=${targetPREFIX}_${queryPREFIX}
+PREFIX=${TNAME}_${QNAME}
 
-target=${targetPREFIX}.sizes
-query=${queryPREFIX}.sizes
+TCHROM=${TNAME}.sizes
+QCHROM=${QNAME}.sizes
 
-bitTarget=${targetPREFIX}.2bit
-bitQuery=${queryPREFIX}.2bit
+BITTARGET=${TNAME}.2bit
+BITQUERY=${QNAME}.2bit
 
-net=${PREFIX}.chain.net.gz
-axt=${PREFIX}.netted.chain.axt
+NET=${PREFIX}.chain.net
+AXT=${PREFIX}.netted.chain.axt
 
-echo "
-faSize -detailed $targetContigs > $target"
-faSize -detailed $targetContigs > $target
+if [[ "$#" -lt 3 ]]
+then
+	echo "Usage: ./chainsToNets.sh target.fa query.fa /path/to/chains"
+	exit 0
+else
+	if ! [ -e "$BITTARGET" ] ; then
+		echo "faToTwoBit $TARGET $BITTARGET
+		"
+        	faToTwoBit $TARGET $BITTARGET
+	fi
 
-echo "
-faSize -detailed $queryContigs > $query"
-faSize -detailed $queryContigs > $query
+	if ! [ -e "$BITQUERY" ] ; then
+		echo "faToTwoBit $QUERY $BITQUERY
+		"
+        	faToTwoBit $QUERY $BITQUERY
+	fi
 
-echo "
-faToTwoBit $targetContigs $bitTarget"
-faToTwoBit $targetContigs $bitTarget
+	if ! [ -e "$TCHROM" ] ; then
+		echo "faSize -detailed $TARGET > $TCHROM
+		"
+        	faSize -detailed $TARGET > $TCHROM
+	fi
 
-
-echo "
-faToTwoBit $queryContigs $bitQuery"
-faToTwoBit $queryContigs $bitQuery
+	if ! [ -e "$QCHROM" ] ; then
+		echo "faSize -detailed $QUERY > $QCHROM
+		"
+        	faSize -detailed $QUERY > $QCHROM
+	fi
+fi
 
 echo "
 chainMergeSort $DIR/*.chain | chainSplit chainMerge stdin -lump=50"
@@ -57,24 +70,24 @@ chainSort ${PREFIX}.all.chain ${PREFIX}.sorted.chain
 rm -r chainMerge
 
 echo "
-chainPreNet ${PREFIX}.sorted.chain $target $query /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | gzip -c > $net
+chainPreNet ${PREFIX}.sorted.chain $TCHROM $QCHROM /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $TCHROM $QCHROM /dev/stdout /dev/null | netSyntenic /dev/stdin $NET
 "
-chainPreNet ${PREFIX}.sorted.chain $target $query /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $target $query /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | gzip -c > $net
+chainPreNet ${PREFIX}.sorted.chain $TCHROM $QCHROM /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $TCHROM $QCHROM /dev/stdout /dev/null | netSyntenic /dev/stdin $NET
 
 rm ${PREFIX}.all.chain
 echo "
-netChainSubset $net ${PREFIX}.sorted.chain ${PREFIX}.netted.chain
+netChainSubset $NET ${PREFIX}.sorted.chain ${PREFIX}.netted.chain
 "
-netChainSubset $net ${PREFIX}.sorted.chain ${PREFIX}.netted.chain
+netChainSubset $NET ${PREFIX}.sorted.chain ${PREFIX}.netted.chain
 
 echo "
-chainToAxt ${PREFIX}.netted.chain $bitTarget $bitQuery $axt"
-chainToAxt ${PREFIX}.netted.chain $bitTarget $bitQuery $axt
+chainToAxt ${PREFIX}.netted.chain $BITTARGET $BITQUERY $AXT"
+chainToAxt ${PREFIX}.netted.chain $BITTARGET $BITQUERY $AXT
 
 echo "
-/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target $axt ${PREFIX}.sam
+/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $TCHROM $AXT ${PREFIX}.sam
 "
-/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $target $axt ${PREFIX}.sam
+/data/lowelab/edotau/golang/src/github.com/vertgenlab/gonomics/cmd/axtSam/axtSam -chrom $TCHROM $AXT ${PREFIX}.sam
 
 echo "
 samtools sort -@ $SLURM_CPUS_ON_NODE ${PREFIX}.sam > ${PREFIX}.bam"
@@ -88,10 +101,11 @@ netFileStats="netFileStats"
 mkdir -p $netFileStats
 
 echo "
-netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt -syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $net
+netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt -syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $NET
 "
-netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt a-syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $net
+netStats -gap=$netFileStats/${PREFIX}.gap.txt -fill=$netFileStats/${PREFIX}.fill.txt -top=$netFileStats/${PREFIX}.top.txt -syn=$netFileStats/${PREFIX}.syn.txt -nonSyn=$netFileStats/${PREFIX}.nonsyn.txt a-syn=$netFileStats/${PREFIX}.syn.txt -inv=$netFileStats/${PREFIX}.inv.txt -dupe=$netFileStats/${PREFIX}.dupe.txt $netFileStats/${PREFIX}.summary.txt $NET
 
 rm ${PREFIX}.sam
 
 echo "FINISHED"
+
