@@ -36,6 +36,6 @@ echo "finished lastz"
 echo "
 axtChain -linearGap=medium -scoreScheme=$scoreMatrix $axt -faT $target -faQ $query /dev/stdout | chainSort /dev/stdin ${PREFIX}.chain
 "
-axtChain -linearGap=medium -scoreScheme=$scoreMatrix $axt -faT $target -fta target or refQ $query /dev/stdout | chainSort /dev/stdin ${PREFIX}.chain
+axtChain -linearGap=medium -scoreScheme=$scoreMatrix $axt -faT $target -faQ $query /dev/stdout | chainSort /dev/stdin ${PREFIX}.chain
 
 echo "DONE"
