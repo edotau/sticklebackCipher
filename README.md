@@ -4,6 +4,9 @@ Lastz workflow: axt to chain, to netted chains\
 
 ## GATK SNPs/INDELs calling work flow:
 
+### Step 0: Environment setup, (see dockerfile)
+https://github.com/edotau/sticklebackCipher/blob/db6adda15296449debd2b224d2ac975da4cec9c1/gatk/Dockerfile#L1-L18
+
 ### Step 1: Trim Fastqs and align to reference
 https://github.com/edotau/sticklebackCipher/blob/8906a84f3471bbd2c7aa741e3c92dd2d37372616/gatk/src/alignReads.bash#L43-L66
 
