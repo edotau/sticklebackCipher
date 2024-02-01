@@ -12,6 +12,7 @@ Lastz workflow: axt to chain, to netted chains
 ### Step 0: Environment setup, (see dockerfile)
 
 <https://github.com/edotau/sticklebackCipher/blob/db6adda15296449debd2b224d2ac975da4cec9c1/gatk/Dockerfile#L1-L18>
+TODO: conda environment might be the better option to set up env and third party software
 
 ### Step 1: Trim Fastqs and align to reference
 
