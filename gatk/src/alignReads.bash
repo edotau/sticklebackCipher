@@ -7,6 +7,7 @@ export ADAPTERS=$BBDUK_PATH/resources/adapters.fa
 
 export samtools=/usr/bin/samtools
 export bwa=/usr/bin/bwa
+export bbduk="$BBDUK_PATH/bbduk.sh"
 
 # Validate the number of arguments
 if [ "$#" -ne 3 ]; then
@@ -22,13 +23,12 @@ READ_ONE="$2"
 READ_TWO="$3"
 
 # Extract the base prefix, handling different extensions properly
-PREFIX=$(basename "$READ_ONE" | sed -E 's/\.(fastq|fq)(\.gz)?$//')
+PREFIX=$(basename "$READ_ONE" | sed -E 's/_R[12]//; s/\.(fastq|fq)(\.gz)?$//')
 
 # Define the output directory based on READ_ONE path
 OUTPUT_DIR=$(dirname "$READ_ONE")
 
-
-for cmd in trim_galore bbduk bwa samtools; do
+for cmd in trim_galore $bbduk samtools; do
     if ! command -v "$cmd" &> /dev/null; then
         echo "Error: $cmd is not installed or not in the PATH."
         exit 1
@@ -48,19 +48,19 @@ TRIMMED_REV="${OUTPUT_DIR}/${PREFIX}_val_2.fq.gz"
 
 # Adapter trimming and quality filtering with BBDuk
 echo "["$(date)"]\tRemoving adapters with BBDuk..."
-./bbduk.sh \
+
+$bbduk \
     in1="$TRIMMED_FWD" in2="$TRIMMED_REV" \
     out1="${OUTPUT_DIR}/${PREFIX}_R1.fastq.gz" out2="${OUTPUT_DIR}/${PREFIX}_R2.fastq.gz" \
     minlen=25 qtrim=rl trimq=10 ktrim=r k=25 mink=11 hdist=1 \
-    ref=$ADAPTERS
+    ref="$ADAPTERS"
 
 # MAPPING with bwa and sorting with samtools
 echo -e "["$(date)"]\tAligning and sorting..."
 
 BAM="${OUTPUT_DIR}/${PREFIX}.bam"
 SORT_THREADS=$(( $THREADS / 2 )) # Adjust based on your system's capabilities
+
 bwa mem -t "$THREADS" "$REFERENCE" "${OUTPUT_DIR}/${PREFIX}_R1.fastq.gz" "${OUTPUT_DIR}/${PREFIX}_R2.fastq.gz" | \
 samtools sort -@ "$SORT_THREADS" -T "${OUTPUT_DIR}/${PREFIX}.tmp" -o "$BAM"
-
-# Index the final BAM file
 samtools index "$BAM"

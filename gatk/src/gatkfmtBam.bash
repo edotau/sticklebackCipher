@@ -28,16 +28,32 @@ for cmd in gatk samtools; do
 done
 
 PROCESSED_BAM="${PREFIX}.gatk.bam"
+MARKED_DUPS=${PREFIX}.nodups.bam
 THREADS=$(( $(nproc) > 12 ? 12 : $(nproc) ))
-MEM=$(awk '/MemAvailable/ {printf "%d", $2/1024/1024*0.9 }' /proc/meminfo)
+
+OS=$(uname -s)
+case "$OS" in
+    Linux*)
+        MEM=$(awk '/MemAvailable/ {printf "%d", $2/1024/1024*0.9 }' /proc/meminfo)
+        ;;
+    Darwin*)
+        MEM=$(sysctl -n hw.memsize | awk '{printf "%d", $1/1024/1024/1024*0.9}')
+        ;;
+    *)
+        echo "Unsupported OS: $OS"
+        exit 1
+        ;;
+esac
+
+export MEM="${MEM}G"
+
 # Extract platform info
 PL=$(samtools view "$BAM" | head -n 1 | cut -f 1 | cut -d ':' -f 3,4 | tr ':' '.')
 
 # Pipeline processing
-gatk --java-options "-Xmx$MEM" MarkDuplicates -I "$BAM" -O /dev/stdout -M /dev/null -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true | \
-    samtools view -b -@ "$THREADS" -f 1 - | \
-    gatk --java-options "-Xmx$MEM" AddOrReplaceReadGroups -I /dev/stdin -O /dev/stdout -LB "WGS" -PL "$PL" -PU "ILUMINA" -SM "$PREFIX" | \
-    gatk --java-options "-Xmx$MEM" FixMateInformation -I /dev/stdin -O "$PROCESSED_BAM" -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true -TMP_DIR "${PREFIX}.fixmate.tmp"
+gatk --java-options "-Xmx$MEM" MarkDuplicates -I $BAM -O $MARKED_DUPS -M ${PREFIX}".dup.metrics" -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true
+
+samtools view -b -@ "$THREADS" -f 1 $MARKED_DUPS | gatk --java-options "-Xmx$MEM" AddOrReplaceReadGroups -I /dev/stdin -O /dev/stdout -LB "WGS" -PL "$PL" -PU "ILUMINA" -SM "$PREFIX" | gatk --java-options "-Xmx$MEM" FixMateInformation -I /dev/stdin -O "$PROCESSED_BAM" -ADD_MATE_CIGAR true -IGNORE_MISSING_MATES true
 
 # Index the final output BAM
 samtools index "$PROCESSED_BAM"
