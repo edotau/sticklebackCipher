@@ -3,7 +3,11 @@
 Marine Assembly: From Pacbio, Nanopore, 10x Genomics, to HiC
 Lastz workflow: axt to chain, to netted chains
 
-## GATK SNPs/INDELs calling work flow:
+## GATK SNPs/INDELs calling work flow
+
+#### Reference
+
+<https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels>
 
 ### Step 0: Environment setup, (see dockerfile)
 
@@ -36,7 +40,3 @@ Lastz workflow: axt to chain, to netted chains
 ### Step 7: The variant recalibration step fits a Gaussian mixture model to the contextual annotations given to each variant
 
 <https://github.com/edotau/sticklebackCipher/blob/acc009d83ed472bb6f661e2bf0685c73c2d9fddb/gatk/src/gatkGenotypeVariants.bash#L35-L62>
-
-#### Reference
-
-<https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels>
