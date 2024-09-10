@@ -16,6 +16,8 @@ fi
 
 # Set required paths, tools and references
 KENT_UTILS="/home"
+
+# Append $KENT_UTILS or set binary directly
 gtfToGenePred="$KENT_UTILS/gtfToGenePred"
 genePredToPsl="$KENT_UTILS/genePredToPsl"
 pslMap="$KENT_UTILS/pslMap"
@@ -108,12 +110,14 @@ if ! [ -e "$OUTPUT_GTF" ]; then
     $genePredToGtf file "$OUTPUT_GTF"
 fi
 
-# Final Output
-echo "All operations completed successfully."
-echo "Generated files:"
-echo "$OUTPUT_BED"
-echo "$OUTPUT_GP"
-echo "$OUTPUT_GTF"
-
 # Clean up intermediate files
 rm -f "$GP_FILE" "$PSL_FILE"
+
+# Final Output
+echo "Completed successfully!
+
+Generated files:
+    $OUTPUT_BED
+    $OUTPUT_GP
+    $OUTPUT_GTF
+"
