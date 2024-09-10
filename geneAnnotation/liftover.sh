@@ -16,6 +16,7 @@ fi
 KENT_UTILS="/home/kentUtils/bin"
 
 # Append $KENT_UTILS and $HTSLIB_UTILS or set binary directly
+axtSort="$KENT_UTILS/axtSort"
 faToTwoBit="$KENT_UTILS/faToTwoBit"
 faSize="$KENT_UTILS/faSize"
 chainStitchId="$KENT_UTILS/chainStitchId"
@@ -25,11 +26,10 @@ chainPreNet="$KENT_UTILS/chainPreNet"
 chainNet="$KENT_UTILS/chainNet"
 netSyntenic="$KENT_UTILS/netSyntenic"
 netChainSubset="$KENT_UTILS/netChainSubset"
-chainToPsl="$KENT_UTILS/chainToPsl"
 netToAxt="$KENT_UTILS/netToAxt"
 
 # Check if all tools exist and are executable
-for i in "$faToTwoBit" "$faSize" "$chainStitchId" "$chainSwap" "$chainSort" "$chainPreNet" "$chainNet" "$netSyntenic" "$netChainSubset" "$chainToPsl" "$netToAxt" "$axtSort" "$samtools"; do
+for i in "$faToTwoBit" "$faSize" "$chainStitchId" "$chainSwap" "$chainSort" "$chainPreNet" "$chainNet" "$netSyntenic" "$netChainSubset" "$netToAxt"; do
     if ! [ -x "$i" ]; then
         echo "Error: $(basename "$i") not found or not executable at $i"
         exit 1
@@ -46,25 +46,31 @@ TCHROM="${TNAME}.sizes"
 QCHROM="${QNAME}.sizes"
 
 # Step 1: Convert target and query to 2bit format if not already done
-echo "
-Converting $TARGET and $QUERY to 2bit format ...
-
+if ! [ -e "$BITTARGET" ]; then
+    echo "Converting $TARGET to 2bit format..."
     $faToTwoBit "$TARGET" "$BITTARGET"
+fi
+if ! [ -e "$BITQUERY" ]; then
+    echo "Converting $QUERY to 2bit format..."
     $faToTwoBit "$QUERY" "$BITQUERY"
-"
-$faToTwoBit "$TARGET" "$BITTARGET"
-$faToTwoBit "$QUERY" "$BITQUERY"
+fi
 
 # Step 2: Create chromSizes for target and query if not already done
-echo "
-Creating chromSizes format...
-
+if ! [ -e "$TCHROM" ]; then
+    echo "Creating chromSizes for $TARGET...
+    
+        $faSize -detailed $TARGET > $TCHROM
+    "
     $faSize -detailed "$TARGET" > "$TCHROM"
-    $faSize -detailed "$QUERY" > "$QCHROM"
-"
-$faSize -detailed "$TARGET" > "$TCHROM"
-$faSize -detailed "$QUERY" > "$QCHROM"
+fi
 
+if ! [ -e "$QCHROM" ]; then
+    echo "Creating chromSizes for $QUERY...
+
+        $faSize -detailed $QUERY > $QCHROM
+    "
+    $faSize -detailed "$QUERY" > "$QCHROM"
+fi
 # Step 3: Swap target best chains to be query-referenced
 QRY_TGT="${QNAME}.${TNAME}.tBest.chain"
 echo "
@@ -110,9 +116,7 @@ Generating target-referenced reciprocal best net...
 
     chainPreNet $TGT_QRY_SWAP_CHAIN $TCHROM $QCHROM /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $TCHROM $QCHROM /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | gzip -c > $TGT_QRY_SWAP_NET
 "
-$chainPreNet "$TGT_QRY_SWAP_CHAIN" "$TCHROM" "$QCHROM" /dev/stdout | \
-$chainNet -minSpace=1 -minScore=0 /dev/stdin "$TCHROM" "$QCHROM" /dev/stdout /dev/null | \
-$netSyntenic /dev/stdin /dev/stdout | gzip -c > "$TGT_QRY_SWAP_NET"
+$chainPreNet "$TGT_QRY_SWAP_CHAIN" "$TCHROM" "$QCHROM" /dev/stdout | $chainNet -minSpace=1 -minScore=0 /dev/stdin "$TCHROM" "$QCHROM" /dev/stdout /dev/null | $netSyntenic /dev/stdin /dev/stdout | gzip -c > "$TGT_QRY_SWAP_NET"
 
 # Step 8: Generate AXT and SAM/BAM files from nets
 TGT_QRY_SWAP_NET_AXT="${TNAME}.${QNAME}.rBest.netted.chain.axt.gz"

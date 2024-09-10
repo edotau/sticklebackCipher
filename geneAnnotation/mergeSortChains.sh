@@ -58,4 +58,6 @@ Sorting merged chains...
 "
 cat chainMerge/*.chain | $chainSort /dev/stdin $OUTPUT
 
-echo "Completed successfully! Output written to $OUTPUT."
+echo "Completed successfully!
+Output written to $OUTPUT.
+"
