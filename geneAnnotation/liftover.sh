@@ -14,7 +14,6 @@ fi
 
 # Set required paths, tools, and references
 KENT_UTILS="/home/kentUtils/bin"
-HTSLIB_UTILS="/home/htslib/bin"
 
 # Append $KENT_UTILS and $HTSLIB_UTILS or set binary directly
 faToTwoBit="$KENT_UTILS/faToTwoBit"
@@ -28,8 +27,6 @@ netSyntenic="$KENT_UTILS/netSyntenic"
 netChainSubset="$KENT_UTILS/netChainSubset"
 chainToPsl="$KENT_UTILS/chainToPsl"
 netToAxt="$KENT_UTILS/netToAxt"
-axtSort="$KENT_UTILS/axtSort"
-samtools="$HTSLIB_UTILS/samtools"
 
 # Check if all tools exist and are executable
 for i in "$faToTwoBit" "$faSize" "$chainStitchId" "$chainSwap" "$chainSort" "$chainPreNet" "$chainNet" "$netSyntenic" "$netChainSubset" "$chainToPsl" "$netToAxt" "$axtSort" "$samtools"; do
@@ -117,9 +114,6 @@ $chainPreNet "$TGT_QRY_SWAP_CHAIN" "$TCHROM" "$QCHROM" /dev/stdout | \
 $chainNet -minSpace=1 -minScore=0 /dev/stdin "$TCHROM" "$QCHROM" /dev/stdout /dev/null | \
 $netSyntenic /dev/stdin /dev/stdout | gzip -c > "$TGT_QRY_SWAP_NET"
 
-# Clean up intermediate files
-rm -f "$QRY_TGT"
-
 # Step 8: Generate AXT and SAM/BAM files from nets
 TGT_QRY_SWAP_NET_AXT="${TNAME}.${QNAME}.rBest.netted.chain.axt.gz"
 echo "
@@ -129,6 +123,7 @@ Converting nets to AXT format...
 "
 $netToAxt "$TGT_QRY_SWAP_NET" "$TGT_QRY_SWAP_CHAIN" "$BITTARGET" "$BITQUERY" /dev/stdout | $axtSort /dev/stdin /dev/stdout | gzip -c > "$TGT_QRY_SWAP_NET_AXT"
 
+# Clean up intermediate files
 rm -f "$BITTARGET" "$BITQUERY" "$TCHROM" "$QCHROM" "$QRY_TGT" "$QRY_TGT_NET" "$QRY_TGT_NETCHAIN" "$TGT_QRY_SWAP_CHAIN"
 
 # Success message
