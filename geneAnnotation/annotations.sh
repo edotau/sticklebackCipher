@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Input arguments
 TARGET=$1
