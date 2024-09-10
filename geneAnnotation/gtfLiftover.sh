@@ -56,7 +56,6 @@ if ! [ -x "$genePredToGtf" ]; then
     exit 1
 fi
 
-# Paths to reference files
 
 # Check if the chrom sizes file exists
 if ! [ -f "$TARGET_CHROM_SIZES" ]; then
