@@ -13,7 +13,7 @@ if [[ "$#" -lt 3 ]]; then
 fi
 
 # Set required paths, tools, and references
-KENT_UTILS="/home/kentUtils/bin"
+KENT_UTILS="/Users/edotau/src/github.com/kentUtils/bin"
 
 # Append $KENT_UTILS and $HTSLIB_UTILS or set binary directly
 axtSort="$KENT_UTILS/axtSort"
@@ -36,7 +36,7 @@ for i in "$faToTwoBit" "$faSize" "$chainStitchId" "$chainSwap" "$chainSort" "$ch
     fi
 done
 
-# Derived variables
+# Define Variables
 TNAME=$(basename "$TARGET" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//')
 QNAME=$(basename "$QUERY" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//')
 
@@ -76,7 +76,7 @@ QRY_TGT="${QNAME}.${TNAME}.tBest.chain"
 echo "
 Swapping chains to query-referenced ...
 
-    chainStitchId $TCHAIN /dev/stdout | chainSwap /dev/stdin /dev/stdout | chainSort /dev/stdin ${QNAME}_${TNAME}.tBest.chain
+    $chainStitchId $TCHAIN /dev/stdout | $chainSwap /dev/stdin /dev/stdout | $chainSort /dev/stdin ${QNAME}_${TNAME}.tBest.chain
 "
 $chainStitchId "$TCHAIN" /dev/stdout | $chainSwap /dev/stdin /dev/stdout | $chainSort /dev/stdin "$QRY_TGT"
 
@@ -85,18 +85,16 @@ QRY_TGT_NET="${QNAME}.${TNAME}.rBest.net.gz"
 echo "
 Generating reciprocal best net for query-referenced chains...
 
-    chainPreNet $QRY_TGT $QCHROM $TCHROM /dev/stdout | chainNet -minSpace=1 -minScore=0 /dev/stdin $QCHROM $TCHROM /dev/stdout /dev/null | netSyntenic /dev/stdin /dev/stdout | gzip -c > $QRY_TGT_NET
+    $chainPreNet $QRY_TGT $QCHROM $TCHROM /dev/stdout | $chainNet -minSpace=1 -minScore=0 /dev/stdin $QCHROM $TCHROM /dev/stdout /dev/null | $netSyntenic /dev/stdin /dev/stdout | gzip -c > $QRY_TGT_NET
 "
-$chainPreNet "$QRY_TGT" "$QCHROM" "$TCHROM" /dev/stdout | \
-$chainNet -minSpace=1 -minScore=0 /dev/stdin "$QCHROM" "$TCHROM" /dev/stdout /dev/null | \
-$netSyntenic /dev/stdin /dev/stdout | gzip -c > "$QRY_TGT_NET"
+$chainPreNet "$QRY_TGT" "$QCHROM" "$TCHROM" /dev/stdout | $chainNet -minSpace=1 -minScore=0 /dev/stdin "$QCHROM" "$TCHROM" /dev/stdout /dev/null | $netSyntenic /dev/stdin /dev/stdout | gzip -c > "$QRY_TGT_NET"
 
 # Step 5: Extract query-referenced reciprocal best chain
 QRY_TGT_NETCHAIN="${QNAME}.${TNAME}.rBest.netted.chain.gz"
 echo "
 Extracting reciprocal best chain for query-referenced chains...
 
-    netChainSubset $QRY_TGT_NET $QRY_TGT /dev/stdout | chainStitchId /dev/stdin /dev/stdout | gzip -c > $QRY_TGT_NETCHAIN
+    $netChainSubset $QRY_TGT_NET $QRY_TGT /dev/stdout | $chainStitchId /dev/stdin /dev/stdout | gzip -c > $QRY_TGT_NETCHAIN
 "
 $netChainSubset "$QRY_TGT_NET" "$QRY_TGT" /dev/stdout | $chainStitchId /dev/stdin /dev/stdout | gzip -c > "$QRY_TGT_NETCHAIN"
 
@@ -105,7 +103,7 @@ TGT_QRY_SWAP_CHAIN="${TNAME}.${QNAME}.rBest.netted.chain.gz"
 echo "
 Swapping to target-referenced reciprocal best chain...
 
-    chainSwap $QRY_TGT_NETCHAIN /dev/stdout | chainSort /dev/stdin /dev/stdout | gzip -c > $TGT_QRY_SWAP_CHAIN
+    $chainSwap $QRY_TGT_NETCHAIN /dev/stdout | $chainSort /dev/stdin /dev/stdout | gzip -c > $TGT_QRY_SWAP_CHAIN
 "
 $chainSwap "$QRY_TGT_NETCHAIN" /dev/stdout | $chainSort /dev/stdin /dev/stdout | gzip -c > "$TGT_QRY_SWAP_CHAIN"
 

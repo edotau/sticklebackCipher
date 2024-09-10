@@ -18,24 +18,25 @@ axtChain="$KENT_UTILS/axtChain"
 chainSort="$KENT_UTILS/chainSort"
 
 # Check if all tools exist and are executable
-for i in "$lastz" "$axtChain"; do
+for i in "$lastz" "$axtChain" "$chainSort"; do
     if ! [ -x "$i" ]; then
         echo "Error: $(basename "$i") not found or not executable at $i"
         exit 1
     fi
 done
 
-# Determine Scoring matrix
-MATRIX="human-chimp-matrix.txt"
-touch $MATRIX && rm -f $MATRIX
-echo "A     C     G     T
-    A   91  -114   -31  -123
-    C -114   100  -125   -31
-    G  -31  -125   100  -114
-    T -123   -31  -114    91
-" > $MATRIX
-
 PREFIX=$(basename "$TARGET" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//')_$(basename "$QUERY" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//')
+
+# Determine Scoring matrix
+MATRIX="humanChimp.mat"
+if ! [ -e "$MATRIX" ]; then
+    echo "A     C     G     T
+        A   91  -114   -31  -123
+        C -114   100  -125   -31
+        G  -31  -125   100  -114
+        T -123   -31  -114    91
+    " > $MATRIX
+fi
 
 # Output files
 axt=${PREFIX}.axt
@@ -58,10 +59,6 @@ Converting AXT to chain format...
 "
 $axtChain -linearGap=medium -scoreScheme="$MATRIX" "$axt" -faT "$TARGET" -faQ "$QUERY" /dev/stdout | $chainSort /dev/stdin "$chainFile"
 echo "Finished converting axt to chain!"
-
-# Clean up intermediate files
-echo "Cleaning up files..."
-rm -f $MATRIX
 
 # Success message
 echo "Completed successfully!
