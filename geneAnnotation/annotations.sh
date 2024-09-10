@@ -13,7 +13,7 @@ if [[ "$#" -lt 4 ]]; then
     exit 1
 fi
 
-# Set required paths, tools and references
+# Set required paths, tools, and references
 KENT_UTILS="/home/kentUtils/bin"
 
 # Append $KENT_UTILS or set binary directly
@@ -44,46 +44,60 @@ OUTPUT_GP="${OUTPUT}.gp"
 OUTPUT_GTF="${OUTPUT}.gtf"
 
 # Step 1: Create target chromSizes from target .fa
-if ! [ -e "$TCHROM" ]; then
-    echo "Creating chromSizes format..."
-    $faSize -detailed "$TARGET" > "$TCHROM"
-fi
+echo "
+Creating chromSizes format...
+
+    faSize -detailed $TARGET > $TCHROM
+"
+$faSize -detailed "$TARGET" > "$TCHROM"
 
 # Step 2: Convert GTF to GenePred format
-if ! [ -e "$GP_FILE" ]; then
-    echo "Converting $GTF to GenePred format..."
-    $gtfToGenePred -genePredExt -includeVersion "$GTF" "$GP_FILE"
-fi
+echo "
+Converting $GTF to GenePred format...
+
+    gtfToGenePred -genePredExt -includeVersion $GTF $GP_FILE
+"
+$gtfToGenePred -genePredExt -includeVersion "$GTF" "$GP_FILE"
 
 # Step 3: Convert GenePred to PSL format
-if ! [ -e "$PSL_FILE" ]; then
-    echo "Converting $GP_FILE to PSL format..."
-    $genePredToPsl "$TCHROM" "$GP_FILE" "$PSL_FILE"
-fi
+echo "
+Converting $GP_FILE to PSL format...
+
+    genePredToPsl $TCHROM $GP_FILE $PSL_FILE
+"
+$genePredToPsl "$TCHROM" "$GP_FILE" "$PSL_FILE"
 
 # Step 4: Map PSL using chain file
-if ! [ -e "$MAPPED_PSL_FILE" ]; then
-    echo "Mapping $PSL_FILE using chain file..."
-    $pslMap -chainMapFile -swapMap "$PSL_FILE" "$CHAIN" "$MAPPED_PSL_FILE"
-fi
+echo "
+Mapping $PSL_FILE using chain file...
+
+    pslMap -chainMapFile -swapMap $PSL_FILE $CHAIN $MAPPED_PSL_FILE
+"
+$pslMap -chainMapFile -swapMap "$PSL_FILE" "$CHAIN" "$MAPPED_PSL_FILE"
 
 # Step 5: Convert mapped PSL to BED format
-if ! [ -e "$OUTPUT_BED" ]; then
-    echo "Converting $MAPPED_PSL_FILE to BED format..."
-    $pslToBed "$MAPPED_PSL_FILE" "$OUTPUT_BED"
-fi
+echo "
+Converting $MAPPED_PSL_FILE to BED format...
+
+    pslToBed $MAPPED_PSL_FILE $OUTPUT_BED
+"
+$pslToBed "$MAPPED_PSL_FILE" "$OUTPUT_BED"
 
 # Step 6: Convert BED to GenePred format
-if ! [ -e "$OUTPUT_GP" ]; then
-    echo "Converting $OUTPUT_BED to GenePred format..."
-    $bedToGenePred "$OUTPUT_BED" "$OUTPUT_GP"
-fi
+echo "
+Converting $OUTPUT_BED to GenePred format...
+
+    bedToGenePred $OUTPUT_BED $OUTPUT_GP
+"
+$bedToGenePred "$OUTPUT_BED" "$OUTPUT_GP"
 
 # Step 7: Convert GenePred to GTF format
-if ! [ -e "$OUTPUT_GTF" ]; then
-    echo "Converting $OUTPUT_GP to GTF format..."
-    $genePredToGtf file "$OUTPUT_GTF"
-fi
+echo "
+Converting $OUTPUT_GP to GTF format...
+
+    genePredToGtf file $OUTPUT_GTF
+"
+$genePredToGtf file "$OUTPUT_GTF"
 
 # Final Output
 echo "Completed successfully!
