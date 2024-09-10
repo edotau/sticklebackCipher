@@ -1,41 +1,68 @@
-#!/bin/sh
-#SBATCH --mem=4G
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --nodes=1
-set -e
-# Set Path to kentUtils or load kentUtils module if available on your cluster:
-export PATH=/data/lowelab/edotau/kentUtils/:$PATH
+#!/bin/bash -e
 
-# Set lastz or add to path
-lastz=/data/lowelab/edotau/software/lastz-distrib-1.04.00/src/lastz
-
-# Determine Scoring matrix
-scoreMatrix=/data/lowelab/edotau/software/lastz-distrib-1.04.00/humanChimpMatrix.txt
-
-# target or reference fasta MUST be a single record fasta sequence:
-target=$1
-# query fasta can be multi records
-query=$2  # fasta query
+TARGET=$1 # Target/reference fa MUST be a single record fasta sequence
+QUERY=$2  # Query fa can be multi records
 
 if [[ "$#" -lt 2 ]]; then
     echo "Usage: ./lastz.sh target.fa query.fa"
     exit 0
 fi
 
-PREFIX=$(basename $target .fa)_$(basename $query .fa)
+# Set lastz or add to path
+lastz="$PATH/lastz"
+axtChain="$PATH/axtChain"
+
+# Check if all tools exist and are executable
+for i in "$lastz" "$axtChain"; do
+    if ! [ -x "$i" ]; then
+        echo "Error: $(basename "$i") not found or not executable at $i"
+        exit 1
+    fi
+done
+
+# Determine Scoring matrix
+MATRIX="human-chimp-matrix.txt"
+touch $MATRIX && rm -f $MATRIX
+echo "# Substitution matrix (Target: Human, Query: Chimp)
+        A     C     G     T
+    A   91  -114   -31  -123
+    C -114   100  -125   -31
+    G  -31  -125   100  -114
+    T -123   -31  -114    91
+" > $MATRIX
+
+PREFIX=$(basename "$TARGET" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//'))_$(basename "$QUERY" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//'))
+
+# Output files
 axt=${PREFIX}.axt
+chainFile=${PREFIX}.chain
 
+# Step 1: Run lastz alignment
 echo "
-$lastz $target $query --format=axt --output=$axt --scores=$scoreMatrix O=600 E=150 T=2 M=254 K=4500 L=4500 Y=15000 C=0
+Running lastz alignment...
+
+    $lastz $TARGET $QUERY --format=axt --output=$axt --scores=$MATRIX O=600 E=150 T=2 M=254 K=4500 L=4500 Y=15000 C=0
 "
-$lastz $target $query --format=axt --output=$axt --scores=$scoreMatrix O=600 E=150 T=2 M=254 K=4500 L=4500 Y=15000 C=0 
+$lastz "$TARGET" "$QUERY" --format=axt --output="$axt" --scores="$MATRIX" O=600 E=150 T=2 M=254 K=4500 L=4500 Y=15000 C=0
+echo "Finished lastz alignment!"
 
-echo "finished lastz"
-
+# Step 2: Convert AXT to chain format
 echo "
-axtChain -linearGap=medium -scoreScheme=$scoreMatrix $axt -faT $target -faQ $query /dev/stdout | chainSort /dev/stdin ${PREFIX}.chain
-"
-axtChain -linearGap=medium -scoreScheme=$scoreMatrix $axt -faT $target -faQ $query /dev/stdout | chainSort /dev/stdin ${PREFIX}.chain
+Converting AXT to chain format...
 
-echo "DONE"
+    $axtChain -linearGap=medium -scoreScheme=$MATRIX $axt -faT $TARGET -faQ $QUERY /dev/stdout | chainSort /dev/stdin $chainFile
+"
+$axtChain -linearGap=medium -scoreScheme="$MATRIX" "$axt" -faT "$TARGET" -faQ "$QUERY" /dev/stdout | chainSort /dev/stdin "$chainFile"
+echo "Finished converting axt to chain!"
+
+# Clean up intermediate files
+echo "Cleaning up files..."
+rm -f $MATRIX
+
+# Success message
+echo "Completed successfully!
+
+Generated files:
+    $axt
+    $chainFile
+"
