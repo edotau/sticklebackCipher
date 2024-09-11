@@ -14,7 +14,7 @@ if [[ "$#" -lt 4 ]]; then
 fi
 
 # Set required paths, tools, and references
-KENT_UTILS="/home/kentUtils/bin"
+KENT_UTILS="/Users/edotau/src/github.com/kentUtils/bin"
 
 # Append $KENT_UTILS or set binary directly
 bedToGenePred="$KENT_UTILS/bedToGenePred"
@@ -37,7 +37,6 @@ done
 # Derived variables
 PREFIX=$(basename "$GTF" .gtf)
 TCHROM=$(basename "$TARGET" | sed -E 's/\.(fa|fa\.gz|fasta|fasta\.gz)$//').sizes
-GP_FILE="${PREFIX}.gp"
 PSL_FILE="${PREFIX}.psl"
 MAPPED_PSL_FILE="${OUTPUT}.psl"
 OUTPUT_BED="${OUTPUT}.bed"
@@ -45,7 +44,7 @@ OUTPUT_GP="${OUTPUT}.gp"
 OUTPUT_GTF="${OUTPUT}.gtf"
 
 # Step 1: Create target chromSizes from target .fa
-if [[ ! -f "$TCROM" ]]; then
+if [[ ! -f "$TCHROM" ]]; then
     echo "Generating target chrom sizes...
     
         $faSize -detailed $TARGET > $TCHROM
@@ -57,9 +56,9 @@ fi
 echo "
 Converting $GTF to PSL format...
 
-    $gtfToGenePred -genePredExt -includeVersion $GTF /dev/stdout | $genePredToBed /dev/stdin  /dev/stdout | $bedToPsl -tabs -keepQuery $TCHROM /dev/stdin $PSL_FILE
+    $gtfToGenePred -genePredExt -includeVersion -geneNameAsName2 $GTF /dev/stdout | $genePredToBed /dev/stdin  /dev/stdout | $bedToPsl -tabs -keepQuery $TCHROM /dev/stdin $PSL_FILE
 "
-$gtfToGenePred -genePredExt -includeVersion "$GTF" /dev/stdout | $genePredToBed /dev/stdin /dev/stdout | $bedToPsl -tabs -keepQuery "$TCHROM" /dev/stdin "$PSL_FILE"
+$gtfToGenePred -genePredExt -includeVersion -geneNameAsName2 "$GTF" /dev/stdout | $genePredToBed /dev/stdin /dev/stdout | $bedToPsl -tabs -keepQuery "$TCHROM" /dev/stdin "$PSL_FILE"
 
 
 # Step 3: Map PSL using chain file
