@@ -60,7 +60,6 @@ Converting $GTF to PSL format...
 "
 $gtfToGenePred -genePredExt -includeVersion -geneNameAsName2 "$GTF" /dev/stdout | $genePredToBed /dev/stdin /dev/stdout | $bedToPsl -tabs -keepQuery "$TCHROM" /dev/stdin "$PSL_FILE"
 
-
 # Step 3: Map PSL using chain file
 echo "
 Mapping $PSL_FILE using chain file...
